@@ -13,7 +13,7 @@ app.get('/publish', (req, res) => {
     currencies.eur().then((value) => {
         publisher(value); // Send the value to rabbitmq queue
         res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({ eur: value }));
+        res.send(JSON.stringify({ eur: value }, null, 3));
     });
 });
 
