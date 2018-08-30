@@ -17,7 +17,7 @@ const currencies = {
         return request(options)
             .then(function ($) {
                 let value = $("#last_last").text();
-                if(value === "" | value === undefined) {
+                if(value === "" || value === undefined) {
                     return Promise.reject("Hata");
                 }
                 return value;
