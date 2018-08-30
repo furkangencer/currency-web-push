@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "start": "node server/server.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "petrucci53",
@@ -11,6 +12,7 @@
   "dependencies": {
     "amqplib": "^0.5.2",
     "cheerio": "^1.0.0-rc.2",
+    "express": "^4.16.3",
     "request": "^2.88.0",
     "request-promise": "^4.2.2"
   }
