@@ -18,7 +18,8 @@ app.get('/publish', (req, res) => {
 });
 
 app.get('/subscribe', (req, res) => {
-    res.send("TODO: serviceWorker registration");
+    //TODO: serviceWorker registration
+    res.send("SW");
 });
 
 app.get('/', (req, res) => {
