@@ -1,10 +1,10 @@
 # currency-web-push
-In this project, it is intended to get realtime currency rate (for now just EURTRY) and send it as a push notification through the user's web browser.
+In this project, it is intended to get realtime currency rate and send it as a push notification through the user's web browser.
 
 Simply visiting `/publish` route will get the data and send it to the queue. Then consumer which also runs upon server start will receive this message and send it as a push notification.
 
 #### Why I didn't use an API to get currency rates: 
-Since **free** APIs found on the google offer limited service and are updated hourly, I've decided to make a request to investing.com's website which is updated momentarily, and get the body and then extract the spesific span element that holds the currency data. (cheerio is very handy for this)
+Since **free** APIs found on the google offer limited service and are updated hourly, I've decided to make a request to x-rates.com's website which is updated momentarily, and get the body and then extract the specific span element that holds the currency data. (cheerio is very handy for this)
 
 #### Important Note:
 If you want to host the application and make it listen on the port specified, you might want to check the articles below out since you'll have to make some configurations in your server. 
