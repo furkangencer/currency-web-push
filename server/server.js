@@ -15,11 +15,11 @@ let currenciesJsonOutput = {
 };
 app.get('/publish', async (req, res) => {
     await currencies(1, 'EUR', 'TRY').then((value) => {
-        publisher(value); // Send the value to rabbitmq queue
+        publisher(value); // Send the value to queue
         currenciesJsonOutput.eur = value;
     });
     await currencies(1, 'USD', 'TRY').then((value) => {
-        publisher(value); // Send the value to rabbitmq queue
+        publisher(value); // Send the value to queue
         currenciesJsonOutput.usd = value;
     });
 

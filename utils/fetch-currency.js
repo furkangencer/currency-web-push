@@ -22,7 +22,7 @@ const currencies = (amount, from, to) => {
         .then(function ($) {
             let value = $(".ccOutputRslt").text();
             if(value === "" || value === undefined) {
-                return Promise.reject("Hata");
+                return Promise.reject("No string found");
             }
             return value;
         })
