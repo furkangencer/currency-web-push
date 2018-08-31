@@ -9,12 +9,22 @@ var app = express();
 // Start consumer
 consumer();
 
-app.get('/publish', (req, res) => {
-    currencies.eur().then((value) => {
+let currenciesJsonOutput = {
+    eur: "",
+    usd: ""
+};
+app.get('/publish', async (req, res) => {
+    await currencies(1, 'EUR', 'TRY').then((value) => {
         publisher(value); // Send the value to rabbitmq queue
-        res.setHeader('Content-Type', 'application/json');
-        res.send(JSON.stringify({ eur: value }, null, 3));
+        currenciesJsonOutput.eur = value;
     });
+    await currencies(1, 'USD', 'TRY').then((value) => {
+        publisher(value); // Send the value to rabbitmq queue
+        currenciesJsonOutput.usd = value;
+    });
+
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(currenciesJsonOutput, null, 3));
 });
 
 app.get('/subscribe', (req, res) => {
