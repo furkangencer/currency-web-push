@@ -1,10 +1,15 @@
 const express = require('express');
+const path = require('path');
 const port = 3000;
 const {currencies} = require("../utils/fetch-currency.js");
 const {publisher} = require("../amqp/publisher.js");
 const {consumer} = require("../amqp/consumer.js");
 
 var app = express();
+
+const publicPath = path.join(__dirname, '../public');
+app.use(express.static(publicPath));
+
 
 // Start consumer
 consumer();
@@ -27,14 +32,6 @@ app.get('/publish', async (req, res) => {
     res.send(JSON.stringify(currenciesJsonOutput, null, 3));
 });
 
-app.get('/subscribe', (req, res) => {
-    //TODO: serviceWorker registration
-    res.send("SW");
-});
-
-app.get('/', (req, res) => {
-    res.send("test");
-});
 
 app.listen(port, () => {
     console.log(`Started on port ${port}`);
