@@ -5,9 +5,7 @@ const publisher = (msg) => {
         return conn.createChannel().then((channel) => {
             let queue = 'development';
 
-            let ok = channel.assertQueue(queue);
-
-            return ok.then((_qok) => {
+            return channel.assertQueue(queue).then((_qok) => {
                 // NB: `sentToQueue` and `publish` both return a boolean
                 // indicating whether it's OK to send again straight away, or
                 // (when `false`) that you should wait for the event `'drain'`
