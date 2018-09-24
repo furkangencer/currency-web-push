@@ -1,15 +1,21 @@
 const express = require('express');
 const path = require('path');
+const http = require('http');
+const socketIO = require('socket.io');
 const port = 3000;
+
 const {currencies} = require("../utils/fetch-currency.js");
 const {publisher} = require("../amqp/publisher.js");
 const {consumer} = require("../amqp/consumer.js");
+const {publicKey} = require("./vapid/vapid.json");
 
-var app = express();
+let app = express();
+
+let server = http.Server(app);
+let io = socketIO(server);
 
 const publicPath = path.join(__dirname, '../public');
 app.use(express.static(publicPath));
-
 
 // Start consumer
 consumer();
@@ -32,7 +38,11 @@ app.get('/publish', async (req, res) => {
     res.send(JSON.stringify(currenciesJsonOutput, null, 3));
 });
 
+io.on('connection', (socket) => {
+    socket.emit('publicKey', publicKey);
+});
 
-app.listen(port, () => {
+// WARNING: app.listen() will NOT work here because of socket.io
+server.listen(port, () => {
     console.log(`Started on port ${port}`);
 });

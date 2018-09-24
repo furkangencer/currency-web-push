@@ -1,8 +1,19 @@
-/* eslint-env browser, es6 */
+let applicationServerPublicKey = null;
+const socket = io.connect('https://furkangencer.me/');
 
-'use strict';
+socket.on('connect', function() {
+    console.log('Connected to server');
+});
 
-const applicationServerPublicKey = 'BJkh8C3a4bQFEcLla2sr6pzaHTLS-ftxXgWEHU57wgen_6OrdYygOn0bPwthiSY8Mu-hB7Yw7oqEry1A642GA50';
+socket.on('disconnect', function() {
+    console.log('Disconnected from server');
+});
+
+socket.on('publicKey', function(msg) {
+    applicationServerPublicKey = msg;
+});
+
+// const applicationServerPublicKey = 'BJkh8C3a4bQFEcLla2sr6pzaHTLS-ftxXgWEHU57wgen_6OrdYygOn0bPwthiSY8Mu-hB7Yw7oqEry1A642GA50';
 
 const pushButton = document.querySelector('.js-push-btn');
 
