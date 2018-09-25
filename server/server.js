@@ -7,7 +7,7 @@ const port = 3000;
 const {currencies} = require("../utils/fetch-currency.js");
 const {publisher} = require("../amqp/publisher.js");
 const {consumer} = require("../amqp/consumer.js");
-const {publicKey} = require("./vapid/vapid.json");
+const {publicKey, triggerPush} = require("../utils/push.js");
 
 let app = express();
 
@@ -40,6 +40,15 @@ app.get('/publish', async (req, res) => {
 
 io.on('connection', (socket) => {
     socket.emit('publicKey', publicKey);
+
+    socket.on('triggerPush', (message, callback) => {
+        console.log('triggerPush', message);
+
+        triggerPush(message.subscription, message.payload);
+
+        //Acknowledgement - Tell the client that server has received the message.
+        callback(message); //callback('This is from the server');
+    });
 });
 
 // WARNING: app.listen() will NOT work here because of socket.io

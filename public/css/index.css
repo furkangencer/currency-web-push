@@ -49,6 +49,12 @@ pre code {
   transition: opacity 1s;
 }
 
+p.buttons{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+}
+
 @media (max-width: 600px) {
   header > h1 {
     font-size: 36px;

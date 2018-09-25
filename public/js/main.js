@@ -13,9 +13,9 @@ socket.on('publicKey', function(msg) {
     applicationServerPublicKey = msg;
 });
 
-// const applicationServerPublicKey = 'BJkh8C3a4bQFEcLla2sr6pzaHTLS-ftxXgWEHU57wgen_6OrdYygOn0bPwthiSY8Mu-hB7Yw7oqEry1A642GA50';
-
 const pushButton = document.querySelector('.js-push-btn');
+const showPushViaServerButton = document.querySelector('.show-push-server-btn');
+const showPushViaBrowserButton = document.querySelector('.show-push-browser-btn');
 
 let isSubscribed = false;
 let swRegistration = null;
@@ -45,6 +45,33 @@ function initializeUI() {
         }
     });
 
+    showPushViaServerButton.addEventListener('click', () => {
+        var options = {
+            title: "deneme",
+            body: 'Here is a notification body!',
+            icon: 'images/example.png',
+            vibrate: [100, 50, 100],
+            data: {
+                dateOfArrival: Date.now(),
+                primaryKey: 1,
+                url: 'https://www.google.com',
+                firstButton: 'https://www.apple.com',
+                secondButton: 'https://www.tesla.com',
+            },
+            actions: [
+                {action: 'firstButton',title: 'Apple',
+                    icon: 'images/checkmark.png'},
+                {action: 'secondButton', title: 'Tesla',
+                    icon: 'images/xmark.png'},
+            ]
+        };
+        displayNotificationViaServer(options);
+    });
+
+    showPushViaBrowserButton.addEventListener('click', () => {
+        displayNotification();
+    });
+
     // Set the initial subscription value
     swRegistration.pushManager.getSubscription()
         .then((subscription) => {
@@ -53,7 +80,7 @@ function initializeUI() {
             updateSubscriptionOnServer(subscription);
 
             if (isSubscribed) {
-                console.log('User IS subscribed.');
+                console.log('User IS subscribed.', subscription);
             } else {
                 console.log('User is NOT subscribed.');
             }
@@ -156,8 +183,7 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
 
 function displayNotification() {
     if (Notification.permission === 'granted') {
-        navigator.serviceWorker.getRegistration().then(function(reg) {
-            // req and swRegistration objects are the same
+        if(swRegistration){
             var options = {
                 body: 'Here is a notification body!',
                 icon: 'images/example.png',
@@ -176,13 +202,23 @@ function displayNotification() {
                         icon: 'images/xmark.png'},
                 ]
             };
-            reg.showNotification('Hello world!', options);
+            swRegistration.showNotification('Hello world!', options);
             //Notice the showNotification method is called on the service worker registration object.
             // This creates the notification on the active service worker, so that events triggered by interactions with the notification are heard by the service worker.
-        });
-    } else if (Notification.permission === "blocked") {
-        /* the user has previously denied push. Can't reprompt. */
+        }
+    } else if (Notification.permission === "denied") {
+        console.log("The user has previously denied push. Can't reprompt.");
     } else {
-        /* show a prompt to the user */
+        console.log("Permission is not granted.");
     }
+}
+
+function displayNotificationViaServer(payload="Test") {
+    swRegistration.pushManager.getSubscription().then((subscription) => {
+        if(subscription){
+            socket.emit('triggerPush', { subscription, payload }, function () {
+                console.log("Push triggered");
+            })
+        }
+    });
 }

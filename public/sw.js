@@ -3,18 +3,10 @@
 'use strict';
 
 self.addEventListener('push', (event) => {
-    console.log('[Service Worker] Push Received.');
-    console.log(`[Service Worker] Push had this data: "${event.data.text()}"`);
+    let notification =  event.data.json();
+    console.log('[Service Worker] Push Received: ', notification);
 
-    const title = 'Push Codelab';
-    const options = {
-        body: 'Yay it works.',
-        icon: 'images/icon.png',
-        badge: 'images/badge.png',
-        // image: 'images/icon.png'
-    };
-
-    event.waitUntil(self.registration.showNotification(title, options));
+    event.waitUntil(self.registration.showNotification(notification.title, notification));
 });
 
 self.addEventListener('notificationclick', (event) => {

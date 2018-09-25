@@ -22,11 +22,10 @@
 	<main>
 		<p>Welcome to the push messaging codelab. The button below needs to be
 			fixed to support subscribing to push.</p>
-		<p>
-			<button disabled class="js-push-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">
-				Enable Push Messaging
-			</button>
-			<button onclick="displayNotification()" class=" mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Show Push</button>
+		<p class="buttons">
+			<button disabled class="js-push-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Enable Push Messaging</button>
+			<button title="You have to grant permission and have a subscription" class="show-push-server-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Show Push (via Server)*</button>
+			<button title="You have to grant permission" class="show-push-browser-btn mdl-button mdl-js-button mdl-button--raised mdl-js-ripple-effect">Show Push (via Browser)*</button>
 		</p>
 		<section class="subscription-details js-subscription-details is-invisible">
 			<p>Once you've subscribed your user, you'd send their subscription to your
