@@ -15,7 +15,7 @@ const triggerPush = function(subscription, dataToSend) {
             console.log('Success: ', res.statusCode);
         })
         .catch((err) => {
-            if (err.statusCode === 410 || err.statusCode === 400) {
+            if (err.statusCode === 410 || err.statusCode === 404) {
                 console.log('Subscription is no longer valid: ', err);
                 //TODO: db'den silme işlemi yapılmalı
                 // return deleteSubscriptionFromDatabase(subscription._id);

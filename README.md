@@ -7,7 +7,7 @@ Simply visiting `/publish` route will get the data and send it to the queue. The
 Since **free** APIs found on the google offer limited service and are updated hourly, I've decided to make a request to x-rates.com's website which is updated momentarily, and get the body and then extract the specific span element that holds the currency data. (cheerio is very handy for this)
 
 #### Important Note:
-If you want to host the application and make it listen on the port specified, you might want to check the articles below out since you'll have to make some configurations in your server. 
+If you want to host the application and make it listen on the port specified, you might want to take a look at the articles below since you'll have to make some configurations in your server. 
 
 [For Nginx (Step-4)](https://www.digitalocean.com/community/tutorials/how-to-set-up-a-node-js-application-for-production-on-ubuntu-18-04 )
 
@@ -15,9 +15,6 @@ If you want to host the application and make it listen on the port specified, yo
 [For Apache](https://blog.cloudboost.io/get-apache-and-node-working-together-on-the-same-domain-with-javascript-ajax-requests-39db51959b79)
 
 ## TODOs:
-Serviceworker will be used.
 
-MongoDB will be used to store users' subscription details for push notifications.
-
-## To be added in the future
-Let the user select the currency that he/she is interested in.
+- MongoDB will be used to store users' subscription details for push notifications.
+- Recieving currency rates via push notification every hour.
