@@ -8,6 +8,7 @@ const {currencies} = require("../utils/fetch-currency.js");
 const {publisher} = require("../amqp/publisher.js");
 const {consumer} = require("../amqp/consumer.js");
 const {publicKey, triggerPush} = require("../utils/push.js");
+const {PushSubscription} = require("../db/models/subscriptions.js");
 
 let app = express();
 
@@ -49,6 +50,20 @@ io.on('connection', (socket) => {
         //Acknowledgement - Tell the client that server has received the message.
         callback(message); //callback('This is from the server');
     });
+
+    socket.on('subscribe', (subscription, callback) => {
+        // console.log('subscribe', subscription);
+
+        let pushSubscription = new PushSubscription({
+            subscription : JSON.stringify(subscription)
+        });
+
+        pushSubscription.save().then((doc) => {
+            console.log('Subscription details have been saved', doc);
+        }, (e) => {
+            console.log('Error', e);
+        });
+    })
 });
 
 // WARNING: app.listen() will NOT work here because of socket.io
