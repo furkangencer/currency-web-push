@@ -8,21 +8,26 @@ webpush.setVapidDetails(
     vapidKeys.privateKey
 );
 
-const triggerPush = function(subscription, dataToSend) {
+const triggerPush = (subscription, dataToSend) => {
+    var hrstart = process.hrtime();
     // (webpush.sendNotification will automatically encrypt the payload for you, so if you use sendNotification you don't need to worry about it).
-    return webpush.sendNotification(subscription, JSON.stringify(dataToSend))
-        .then((res) => {
-            console.log('Success: ', res.statusCode);
-        })
-        .catch((err) => {
-            if (err.statusCode === 410 || err.statusCode === 404) {
-                console.log('Subscription is no longer valid: ', err);
-                //TODO: db'den silme işlemi yapılmalı
-                // return deleteSubscriptionFromDatabase(subscription._id);
-            } else {
-                console.log('Error: ', err);
-            }
-        });
+    return new Promise((resolve, reject) => {
+        return webpush.sendNotification(subscription, JSON.stringify(dataToSend))
+            .then((res) => {
+                var hrend = process.hrtime(hrstart);
+                resolve('Success: ' + res.statusCode + `[${Math.ceil(hrend[1] / 1000000)}ms]`);
+            })
+            .catch((err) => {
+                if (err.statusCode === 410 || err.statusCode === 404) {
+                    var hrend = process.hrtime(hrstart);
+                    resolve('Subscription is no longer valid: ' + err.statusCode + `[${Math.ceil(hrend[1] / 1000000)}ms]`);
+                    //TODO: db'den silme işlemi yapılmalı
+                    // return deleteSubscriptionFromDatabase(subscription._id);
+                } else {
+                    reject(err)
+                }
+            });
+    });
 };
 
 module.exports = {

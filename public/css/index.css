@@ -53,6 +53,11 @@ p.buttons{
   display: flex;
   flex-direction: row;
   justify-content: space-around;
+  flex-wrap: wrap;
+}
+
+.mdl-button {
+  margin-bottom: 20px;
 }
 
 @media (max-width: 600px) {

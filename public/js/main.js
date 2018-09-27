@@ -13,12 +13,37 @@ socket.on('publicKey', function(msg) {
     applicationServerPublicKey = msg;
 });
 
+socket.on('massPushResponse', function(msg) {
+    console.log(msg);
+});
+
 const pushButton = document.querySelector('.js-push-btn');
 const showPushViaServerButton = document.querySelector('.show-push-server-btn');
 const showPushViaBrowserButton = document.querySelector('.show-push-browser-btn');
+const startMassPushButton = document.querySelector('.start-mass-push-btn');
 
 let isSubscribed = false;
 let swRegistration = null;
+
+let options = {
+    title: "deneme",
+    body: 'Here is a notification body!',
+    icon: 'images/example.png',
+    vibrate: [100, 50, 100],
+    data: {
+        dateOfArrival: Date.now(),
+        primaryKey: 1,
+        url: 'https://www.google.com',
+        firstButton: 'https://www.apple.com',
+        secondButton: 'https://www.tesla.com',
+    },
+    actions: [
+        {action: 'firstButton',title: 'Apple',
+            icon: 'images/checkmark.png'},
+        {action: 'secondButton', title: 'Tesla',
+            icon: 'images/xmark.png'},
+    ]
+};
 
 function urlB64ToUint8Array(base64String) {
     const padding = '='.repeat((4 - base64String.length % 4) % 4);
@@ -46,25 +71,6 @@ function initializeUI() {
     });
 
     showPushViaServerButton.addEventListener('click', () => {
-        var options = {
-            title: "deneme",
-            body: 'Here is a notification body!',
-            icon: 'images/example.png',
-            vibrate: [100, 50, 100],
-            data: {
-                dateOfArrival: Date.now(),
-                primaryKey: 1,
-                url: 'https://www.google.com',
-                firstButton: 'https://www.apple.com',
-                secondButton: 'https://www.tesla.com',
-            },
-            actions: [
-                {action: 'firstButton',title: 'Apple',
-                    icon: 'images/checkmark.png'},
-                {action: 'secondButton', title: 'Tesla',
-                    icon: 'images/xmark.png'},
-            ]
-        };
         displayNotificationViaServer(options);
     });
 
@@ -72,15 +78,18 @@ function initializeUI() {
         displayNotification();
     });
 
+    startMassPushButton.addEventListener('click', () => {
+        startMassPush(options);
+    });
+
     // Set the initial subscription value
     swRegistration.pushManager.getSubscription()
         .then((subscription) => {
             isSubscribed = !(subscription === null);
 
-            updateSubscriptionOnServer(subscription);
-
             if (isSubscribed) {
                 console.log('User IS subscribed.', subscription);
+                updateSubscriptionOnServer(subscription);
             } else {
                 console.log('User is NOT subscribed.');
             }
@@ -131,7 +140,6 @@ function unsubscribeUser() {
     swRegistration.pushManager.getSubscription()
         .then((subscription) => {
             if (subscription) {
-                // TODO: Tell application server to delete subscription
                 return subscription.unsubscribe();
             }
         })
@@ -223,4 +231,10 @@ function displayNotificationViaServer(payload="Test") {
             })
         }
     });
+}
+
+function startMassPush(payload = "Test") {
+    socket.emit('massPush', payload, function () {
+        console.log("Mass Push triggered");
+    })
 }

@@ -51,6 +51,25 @@ io.on('connection', (socket) => {
         callback(message); //callback('This is from the server');
     });
 
+    socket.on('massPush', (payload, callback) => {
+        console.log('\n=======Mass Push has started========');
+        PushSubscription.find({statusCode: {$nin : [410, 404]}}).then((docs) => {
+
+            docs.forEach((doc) => {
+                triggerPush(JSON.parse(doc.subscription), payload)
+                    .then((res) => {
+                        socket.emit('massPushResponse', res);
+                        console.log(res);
+                    })
+                    .catch((err) => {
+                        console.log('Error: ', err);
+                    });
+            })
+        });
+
+        // callback(payload); //callback('This is from the server');
+    });
+
     socket.on('subscribe', (subscription, callback) => {
         // console.log('subscribe', subscription);
 
