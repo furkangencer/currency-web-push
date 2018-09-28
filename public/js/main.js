@@ -30,7 +30,11 @@ let options = {
     body: 'Here is a notification body!',
     icon: 'images/push_logo.png',
     image: 'images/push_image.jpg',
+    badge: 'images/push_logo.png', // Badges are only being used on mobile. It's used to replace the browser icon that is shown by default.
     vibrate: [100, 50, 100],
+    requireInteraction: true,
+    renotify: false,
+    tag: 'notification-example', // Tag attribute is the grouping key. When creating a notification with a tag and there is already a notification with the same tag visible to the user, the system automatically replaces it without creating a new notification.
     data: {
         dateOfArrival: Date.now(),
         primaryKey: 1,
