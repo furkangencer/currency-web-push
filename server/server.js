@@ -44,10 +44,10 @@ io.on('connection', (socket) => {
     socket.on('triggerPush', (message, callback) => {
         console.log('triggerPush', message);
 
-        triggerPush(message.subscription, message.payload);
-
-        //Acknowledgement - Tell the client that server has received the message.
-        callback(message); //callback('This is from the server');
+        triggerPush(message.subscription, message.payload).then((res) => {
+            console.log(res.statusCode + ` [${res.execTime}]`);
+            callback(res.statusCode + ` [${res.execTime}]`);
+        });
     });
 
     socket.on('massPush', (payload, callback) => {
@@ -57,7 +57,7 @@ io.on('connection', (socket) => {
                 triggerPush(JSON.parse(doc.subscription), payload)
                     .then((res) => {
                         socket.emit('massPushResponse', res);
-                        console.log(res.statusCode + `[${res.execTime}]`);
+                        console.log(res.statusCode + ` [${res.execTime}]`);
                     })
                     .catch((err) => {
                         console.log('Error: ', err);

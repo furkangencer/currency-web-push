@@ -26,9 +26,10 @@ let isSubscribed = false;
 let swRegistration = null;
 
 let options = {
-    title: "deneme",
+    title: "This is title",
     body: 'Here is a notification body!',
-    icon: 'images/example.png',
+    icon: 'images/push_logo.png',
+    image: 'images/push_image.jpg',
     vibrate: [100, 50, 100],
     data: {
         dateOfArrival: Date.now(),
@@ -39,9 +40,9 @@ let options = {
     },
     actions: [
         {action: 'firstButton',title: 'Apple',
-            icon: 'images/checkmark.png'},
+            icon: 'images/push_button_icon1.png'},
         {action: 'secondButton', title: 'Tesla',
-            icon: 'images/xmark.png'},
+            icon: 'images/push_button_icon2.png'},
     ]
 };
 
@@ -196,24 +197,6 @@ if ('serviceWorker' in navigator && 'PushManager' in window) {
 function displayNotification() {
     if (Notification.permission === 'granted') {
         if(swRegistration){
-            var options = {
-                body: 'Here is a notification body!',
-                icon: 'images/example.png',
-                vibrate: [100, 50, 100],
-                data: {
-                    dateOfArrival: Date.now(),
-                    primaryKey: 1,
-                    url: 'https://www.google.com',
-                    firstButton: 'https://www.apple.com',
-                    secondButton: 'https://www.tesla.com',
-                },
-                actions: [
-                    {action: 'firstButton',title: 'Apple',
-                        icon: 'images/checkmark.png'},
-                    {action: 'secondButton', title: 'Tesla',
-                        icon: 'images/xmark.png'},
-                ]
-            };
             swRegistration.showNotification('Hello world!', options);
             //Notice the showNotification method is called on the service worker registration object.
             // This creates the notification on the active service worker, so that events triggered by interactions with the notification are heard by the service worker.
@@ -228,8 +211,8 @@ function displayNotification() {
 function displayNotificationViaServer(payload="Test") {
     swRegistration.pushManager.getSubscription().then((subscription) => {
         if(subscription){
-            socket.emit('triggerPush', { subscription, payload }, function () {
-                console.log("Push triggered");
+            socket.emit('triggerPush', { subscription, payload }, function (res) {
+                console.log(res);
             })
         }
     });

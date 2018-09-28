@@ -12,7 +12,6 @@ const consumer = () => {
                     return channel.consume(queue, (msg) => {
                         console.log(" [x] Received '%s'", msg.content.toString());
                         }, {noAck: true});
-                    //TODO: Web-Push sending
                 })
                 .then((_consumeOk) => {
                     console.log(' [*] Waiting for messages. To exit press CTRL+C');
