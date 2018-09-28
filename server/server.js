@@ -7,8 +7,7 @@ const port = 3000;
 const {currencies} = require("../utils/fetch-currency.js");
 const {publisher} = require("../amqp/publisher.js");
 const {consumer} = require("../amqp/consumer.js");
-const {publicKey, triggerPush} = require("../utils/push.js");
-const {PushSubscription} = require("../db/models/subscriptions.js");
+const {PushSubscription, publicKey, triggerPush} = require("../utils/push.js");
 
 let app = express();
 
@@ -53,21 +52,19 @@ io.on('connection', (socket) => {
 
     socket.on('massPush', (payload, callback) => {
         console.log('\n=======Mass Push has started========');
-        PushSubscription.find({statusCode: {$nin : [410, 404]}}).then((docs) => {
-
+        PushSubscription.find().then((docs) => {
             docs.forEach((doc) => {
                 triggerPush(JSON.parse(doc.subscription), payload)
                     .then((res) => {
                         socket.emit('massPushResponse', res);
-                        console.log(res);
+                        console.log(res.statusCode + `[${res.execTime}]`);
                     })
                     .catch((err) => {
                         console.log('Error: ', err);
                     });
-            })
+            });
         });
-
-        // callback(payload); //callback('This is from the server');
+        // callback('');
     });
 
     socket.on('subscribe', (subscription, callback) => {
@@ -79,8 +76,10 @@ io.on('connection', (socket) => {
 
         pushSubscription.save().then((doc) => {
             console.log('Subscription details have been saved', doc);
+            callback('Subscription details have been saved');
         }, (e) => {
             console.log('Error', e);
+            callback('User couldn\'t be saved');
         });
     })
 });

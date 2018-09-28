@@ -14,7 +14,7 @@ socket.on('publicKey', function(msg) {
 });
 
 socket.on('massPushResponse', function(msg) {
-    console.log(msg);
+    console.log(msg.statusCode + `[${msg.execTime}]`);
 });
 
 const pushButton = document.querySelector('.js-push-btn');
@@ -89,7 +89,7 @@ function initializeUI() {
 
             if (isSubscribed) {
                 console.log('User IS subscribed.', subscription);
-                updateSubscriptionOnServer(subscription);
+                updateSubscriptionOnServer(subscription, false); // Page has just loaded, so we don't want current subscription object to be saved in order to avoid duplicate entries in database
             } else {
                 console.log('User is NOT subscribed.');
             }
@@ -124,7 +124,7 @@ function subscribeUser() {
         .then((subscription) => {
             console.log('User is subscribed.');
 
-            updateSubscriptionOnServer(subscription);
+            updateSubscriptionOnServer(subscription, true);
 
             isSubscribed = true;
 
@@ -156,16 +156,18 @@ function unsubscribeUser() {
         });
 }
 
-function updateSubscriptionOnServer(subscription) {
+function updateSubscriptionOnServer(subscription, saveToDb = false) {
 
     const subscriptionJson = document.querySelector('.js-subscription-json');
     const subscriptionDetails =
         document.querySelector('.js-subscription-details');
 
     if (subscription) {
-        socket.emit('subscribe', subscription, function () {
-            console.log("User has subscribed");
-        });
+        if (saveToDb) {
+            socket.emit('subscribe', subscription, function (msg) {
+                console.log(msg);
+            });
+        }
         subscriptionJson.textContent = JSON.stringify(subscription);
         subscriptionDetails.classList.remove('is-invisible');
     } else {

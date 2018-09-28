@@ -1,5 +1,6 @@
 const webpush = require('web-push');
 const vapidKeys = require("./../server/vapid/vapid.json");
+const {PushSubscription} = require("../db/models/subscriptions.js");
 
 // Using VAPID also lets you avoid the FCM-specific steps for sending a push message. You no longer need a Firebase project, a gcm_sender_id, or an Authorization header.
 webpush.setVapidDetails(
@@ -9,20 +10,24 @@ webpush.setVapidDetails(
 );
 
 const triggerPush = (subscription, dataToSend) => {
-    var hrstart = process.hrtime();
+    let hrstart = process.hrtime();
     // (webpush.sendNotification will automatically encrypt the payload for you, so if you use sendNotification you don't need to worry about it).
     return new Promise((resolve, reject) => {
         return webpush.sendNotification(subscription, JSON.stringify(dataToSend))
             .then((res) => {
-                var hrend = process.hrtime(hrstart);
-                resolve('Success: ' + res.statusCode + `[${Math.ceil(hrend[1] / 1000000)}ms]`);
+                let hrend = process.hrtime(hrstart);
+
+                PushSubscription.findOneAndUpdate({subscription : JSON.stringify(subscription)}, {statusCode : res.statusCode}, {new:true}).then((doc) => { });
+
+                resolve({statusCode : res.statusCode, execTime : `${Math.ceil(hrend[1] / 1000000)}ms`});
             })
             .catch((err) => {
-                if (err.statusCode === 410 || err.statusCode === 404) {
-                    var hrend = process.hrtime(hrstart);
-                    resolve('Subscription is no longer valid: ' + err.statusCode + `[${Math.ceil(hrend[1] / 1000000)}ms]`);
-                    //TODO: db'den silme işlemi yapılmalı
-                    // return deleteSubscriptionFromDatabase(subscription._id);
+                if (err.statusCode === 410 || err.statusCode === 404) { // Subscription is no longer valid
+                    let hrend = process.hrtime(hrstart);
+
+                    PushSubscription.findOneAndDelete( {subscription: JSON.stringify(subscription)} ).then((doc) => { });
+
+                    resolve({statusCode : err.statusCode, execTime : `${Math.ceil(hrend[1] / 1000000)}ms`});
                 } else {
                     reject(err)
                 }
@@ -31,6 +36,7 @@ const triggerPush = (subscription, dataToSend) => {
 };
 
 module.exports = {
+    PushSubscription,
     publicKey: vapidKeys.publicKey,
     triggerPush
 };
