@@ -8,10 +8,12 @@ const consumer = () => {
             return channel.assertQueue(queue)
                 .then(() => {
                     channel.prefetch(1);
-                }).then((_qok) => {
+                })
+                .then((_qok) => {
                     return channel.consume(queue, (msg) => {
                         console.log(" [x] Received '%s'", msg.content.toString());
-                        }, {noAck: true});
+                        channel.ack(msg);
+                    });
                 })
                 .then((_consumeOk) => {
                     console.log(' [*] Waiting for messages. To exit press CTRL+C');

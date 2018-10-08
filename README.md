@@ -16,5 +16,4 @@ If you want to host the application and make it listen on the port specified, yo
 
 ## TODOs:
 
-- MongoDB will be used to store users' subscription details for push notifications.
 - Recieving currency rates via push notification every hour.
