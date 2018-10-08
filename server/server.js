@@ -2,6 +2,7 @@ const express = require('express');
 const path = require('path');
 const http = require('http');
 const socketIO = require('socket.io');
+const async = require('async');
 const port = 3000;
 
 const {currencies} = require("../utils/fetch-currency.js");
@@ -53,15 +54,22 @@ io.on('connection', (socket) => {
     socket.on('massPush', (payload, callback) => {
         console.log('\n=======Mass Push has started========');
         PushSubscription.find().then((docs) => {
-            docs.forEach((doc) => {
-                triggerPush(JSON.parse(doc.subscription), payload)
+            let i = 1;
+            // Here we're limiting the maximum number of async requests at a time (https://caolan.github.io/async/docs.html#eachLimit)
+            async.eachLimit(docs, 3, async (doc) => {
+                await triggerPush(JSON.parse(doc.subscription), payload)
                     .then((res) => {
                         socket.emit('massPushResponse', res);
-                        console.log(res.statusCode + ` [${res.execTime}]`);
+                        console.log(i++ + ") " + res.statusCode + ` [${res.execTime}]`);
                     })
                     .catch((err) => {
                         console.log('Error: ', err);
                     });
+                return true;
+            }, (err, results) => {
+                if (err) throw err;
+                // results is now an array of the response bodies
+                console.log("=============Finished================")
             });
         });
         // callback('');
