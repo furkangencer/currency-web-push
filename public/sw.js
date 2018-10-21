@@ -2,6 +2,15 @@
 
 'use strict';
 
+// Using skipWaiting() and Clients.claim() together allow a worker to take effect immediately in the client(s).
+self.addEventListener('install', function(event) {
+    event.waitUntil(self.skipWaiting());
+});
+
+self.addEventListener('activate', function(event) {
+    event.waitUntil(self.clients.claim());
+});
+
 self.addEventListener('push', (event) => {
     let notification =  event.data.json();
     console.log('[Service Worker] Push Received: ', notification);
@@ -25,7 +34,7 @@ self.addEventListener('notificationclick', (event) => {
     }
 
     notification.close();
-    event.waitUntil(clients.openWindow(url));
+    event.waitUntil(self.clients.openWindow(url));
 });
 
 self.addEventListener('pushsubscriptionchange', (event) => {
