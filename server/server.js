@@ -57,7 +57,10 @@ io.on('connection', (socket) => {
             let i = 1;
             // Here we're limiting the maximum number of async requests at a time (https://caolan.github.io/async/docs.html#eachLimit)
             async.eachLimit(docs, 3, async (doc) => {
-                await triggerPush(JSON.parse(doc.subscription), payload)
+                await triggerPush({
+                    endpoint: doc.endpoint,
+                    keys: doc.keys
+                }, payload)
                     .then((res) => {
                         socket.emit('massPushResponse', res);
                         console.log(i++ + ") " + res.statusCode + ` [${res.execTime}]`);
@@ -79,7 +82,8 @@ io.on('connection', (socket) => {
         // console.log('subscribe', subscription);
 
         let pushSubscription = new PushSubscription({
-            subscription : JSON.stringify(subscription)
+            endpoint: subscription.endpoint,
+            keys: subscription.keys
         });
 
         pushSubscription.save().then((doc) => {

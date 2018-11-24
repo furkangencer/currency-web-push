@@ -86,21 +86,6 @@ function initializeUI() {
     startMassPushButton.addEventListener('click', () => {
         startMassPush(options);
     });
-
-    // Set the initial subscription value
-    swRegistration.pushManager.getSubscription()
-        .then((subscription) => {
-            isSubscribed = !(subscription === null);
-
-            if (isSubscribed) {
-                console.log('User IS subscribed.', subscription);
-                updateSubscriptionOnServer(subscription, false); // Page has just loaded, so we don't want current subscription object to be saved in order to avoid duplicate entries in database
-            } else {
-                console.log('User is NOT subscribed.');
-            }
-
-            updateBtn();
-        });
 }
 
 function updateBtn() {
@@ -121,13 +106,12 @@ function updateBtn() {
 }
 
 function subscribeUser() {
-    const applicationServerKey = urlB64ToUint8Array(applicationServerPublicKey);
     swRegistration.pushManager.subscribe({
         userVisibleOnly: true,
-        applicationServerKey: applicationServerKey
+        applicationServerKey: urlB64ToUint8Array(applicationServerPublicKey)
     })
         .then((subscription) => {
-            console.log('User is subscribed.');
+            console.log('User is subscribed.', subscription);
 
             updateSubscriptionOnServer(subscription, true);
 
@@ -183,12 +167,29 @@ function updateSubscriptionOnServer(subscription, saveToDb = false) {
 if ('serviceWorker' in navigator && 'PushManager' in window) {
     console.log('Service Worker and Push is supported');
 
-    navigator.serviceWorker.register('sw.js')
+    navigator.serviceWorker.register('sw.js');
+    navigator.serviceWorker.ready
         .then((swReg) => {
             console.log('Service Worker is registered', swReg);
-
             swRegistration = swReg;
-            initializeUI();
+
+            return swReg.pushManager.getSubscription()
+                .then((subscription) => {
+                    return subscription;
+                })
+        })
+        .then((subscription) => {
+            isSubscribed = !(subscription === null);
+
+            if (isSubscribed) {
+                console.log('User IS subscribed.', subscription);
+                updateSubscriptionOnServer(subscription, false); // Page has just loaded, so we don't want current subscription object to be saved in order to avoid duplicate entries in database
+            } else {
+                console.log('User is NOT subscribed.');
+            }
+
+            updateBtn();
+            initializeUI(); // Registers event-listener functions
         })
         .catch((error) => {
             console.error('Service Worker Registration Error', error);

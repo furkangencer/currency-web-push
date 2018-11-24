@@ -17,7 +17,7 @@ const triggerPush = (subscription, dataToSend) => {
             .then((res) => {
                 let hrend = process.hrtime(hrstart);
 
-                PushSubscription.findOneAndUpdate({subscription : JSON.stringify(subscription)}, {statusCode : res.statusCode}, {new:true}).then((doc) => { });
+                PushSubscription.findOneAndUpdate({endpoint : subscription.endpoint}, {statusCode : res.statusCode}, {new:true}).then((doc) => { });
 
                 resolve({statusCode : res.statusCode, execTime : `${Math.ceil(hrend[1] / 1000000)}ms`});
             })
@@ -25,7 +25,7 @@ const triggerPush = (subscription, dataToSend) => {
                 if (err.statusCode === 410 || err.statusCode === 404) { // Subscription is no longer valid
                     let hrend = process.hrtime(hrstart);
 
-                    PushSubscription.findOneAndDelete( {subscription: JSON.stringify(subscription)} ).then((doc) => { });
+                    PushSubscription.findOneAndDelete( {endpoint : subscription.endpoint} ).then((doc) => { });
 
                     resolve({statusCode : err.statusCode, execTime : `${Math.ceil(hrend[1] / 1000000)}ms`});
                 } else {

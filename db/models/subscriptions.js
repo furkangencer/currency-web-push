@@ -1,9 +1,13 @@
 const {mongoose} = require('../mongoose.js');
 
 let PushSubscriptionSchema = new mongoose.Schema({
-    subscription: {
+    endpoint: {
         type: String,
-        required: true
+        index: true
+    },
+    keys: {
+        auth: { type: String },
+        p256dh: { type: String }
     },
     statusCode: {
         type: Number,
