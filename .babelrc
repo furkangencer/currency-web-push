@@ -1,0 +1,13 @@
+{
+  "presets": [
+    [
+      "minify",
+      {
+        "mangle": {
+          "topLevel": true
+        }
+      }
+    ],
+    "@babel/preset-env"
+  ]
+}
